@@ -34,11 +34,14 @@ void MainWindow::new_File(){
     }
 }
 
-void MainWindow::open(){
+void MainWindow::open(std::string mode){
     if (maybe_Save()){
         QString file_name = QFileDialog::getOpenFileName();
         if (!file_name.isEmpty()){
-            load_File(file_name);
+            if (mode == "FILE")
+                load_Text_Edit(file_name);
+            else if (mode == "HTML")
+                load_Html_View(file_name);
         }
     }
 }
@@ -77,7 +80,7 @@ void MainWindow::create_Actions(){
     QMenu *help_Menu = menuBar()->addMenu(tr("&Help"));
     QToolBar *file_Tool_Bar = addToolBar(tr("File"));
 
-    const QIcon new_Icon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
+    const QIcon new_Icon = QIcon("..\\icons\\file-plus.svg");
     QAction *new_Act = new QAction(new_Icon, tr("&New"),this);
     new_Act->setShortcuts(QKeySequence::New);
     new_Act->setStatusTip(tr("Create a new file"));
@@ -85,15 +88,21 @@ void MainWindow::create_Actions(){
     file_Menu->addAction(new_Act);
     file_Tool_Bar->addAction(new_Act);
 
-    const QIcon open_Icon = QIcon::fromTheme("document-open", QIcon(":/images/open.png"));
-    QAction *open_Act = new QAction(open_Icon, tr("&Open..."),this);
-    open_Act->setShortcuts(QKeySequence::Open);
-    open_Act->setStatusTip(tr("Open an existing file"));
-    connect(open_Act,&QAction::triggered,this,&MainWindow::open);
-    file_Menu->addAction(open_Act);
-    file_Tool_Bar->addAction(open_Act);
+    const QIcon open_Icon = QIcon("..\\icons\\file.svg");
+    QAction *open_File_Act = new QAction(open_Icon, tr("&Open..."),this);
+    open_File_Act->setShortcuts(QKeySequence::Open);
+    open_File_Act->setStatusTip(tr("Open an existing file to edit"));
+    connect(open_File_Act,&QAction::triggered,this,[this]{open("FILE");});
+    file_Menu->addAction(open_File_Act);
+    file_Tool_Bar->addAction(open_File_Act);
 
-    const QIcon save_Icon = QIcon::fromTheme("document-save", QIcon(":/images/save.png"));
+    QAction *open_Html_Act = new QAction(open_Icon, tr("&Open..."),this);
+    open_Html_Act->setStatusTip(tr("Open an html file to view"));
+    connect(open_Html_Act,&QAction::triggered,this,[this]{open("HTML");});
+    file_Menu->addAction(open_Html_Act);
+    file_Tool_Bar->addAction(open_Html_Act);
+
+    const QIcon save_Icon = QIcon("..\\icons\\save.svg");
     QAction *save_Act = new QAction(save_Icon, tr("&Save"),this);
     save_Act->setShortcuts(QKeySequence::Save);
     save_Act->setStatusTip(tr("Save the current file"));
@@ -144,25 +153,48 @@ bool MainWindow::maybe_Save(){
 
 }
 
-void MainWindow::load_File(const QString &file_Name){
-    QFile file(file_Name);
-    if (!file.open(QFile::ReadOnly)){
-        QMessageBox::warning(this,tr("Application"),
-                             tr("Cannot read file %1:\n%2.").
-                             arg(QDir::toNativeSeparators(file_Name), file.errorString()));
-        return;
-    }
-    QTextStream in(&file);
+void MainWindow::load_Text_Edit(const QString &file_Name){
 #ifndef QT_NO_CURSOR
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
-    this->ui->text_Edit->setPlainText(in.readAll());
+    QString in = load_File(file_Name);
 #ifndef QT_NO_CURSOR
     QGuiApplication::restoreOverrideCursor();
 #endif
+    if (!in.isNull()){
+        this->ui->text_Edit->setPlainText(in);
+        set_Current_File(file_Name);
+    }
+    else
+        set_Current_File(in);
 
-    set_Current_File(file_Name);
     statusBar()->showMessage(tr("File loaded"),2000);
+}
+
+void MainWindow::load_Html_View(const QString &file_Name){
+    set_Current_HTML(file_Name);
+
+    reload_Html_View();
+    statusBar()->showMessage(tr("File loaded"),2000);
+}
+
+void MainWindow::reload_Html_View(){
+    QUrl url = QUrl::fromLocalFile(this->current_HTML);
+    this->ui->web_View->load(url);
+    this->ui->web_View->show();
+}
+
+QString MainWindow::load_File(const QString &file_Name){
+    QFile file(file_Name);
+    if (!file.open(QFile::ReadOnly)){
+        QString nothing;
+        QMessageBox::warning(this,tr("Application"),
+                             tr("Cannot read file %1:\n%2.").
+                             arg(QDir::toNativeSeparators(file_Name), file.errorString()));
+        return nothing;
+    }
+    QTextStream in(&file);
+    return in.readAll();
 }
 
 bool MainWindow::save_File(const QString &file_Name){
@@ -188,6 +220,7 @@ bool MainWindow::save_File(const QString &file_Name){
         return false;
     }
     set_Current_File(file_Name);
+    reload_Html_View();
     statusBar()->showMessage(tr("File saved"),2000);
     return true;
 }
@@ -199,11 +232,11 @@ void MainWindow::set_Current_File(const QString &file_Name){
     QString shown_name = current_File;
     if (current_File.isEmpty())
         shown_name = "untitled.txt";
-    else{
-        this->ui->web_View->setHtml(this->ui->text_Edit->toPlainText());
-        this->ui->web_View->show();
-    }
     setWindowFilePath(shown_name);
+}
+
+void MainWindow::set_Current_HTML(const QString &file_Name){
+    this->current_HTML = file_Name;
 }
 
 QString MainWindow::stripped_Name(const QString &full_File_Name){

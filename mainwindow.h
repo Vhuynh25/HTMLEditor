@@ -10,6 +10,8 @@
 #include <QSaveFile>
 #include <QCloseEvent>
 #include <QTextStream>
+#include <QWebEngineView>
+#include <QUrl>
 
 namespace Ui {
 class MainWindow;
@@ -21,7 +23,10 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    void load_File(const QString &file_Name);
+    QString load_File(const QString &file_Name);
+    void load_Html_View(const QString &file_Name);
+    void reload_Html_View();
+    void load_Text_Edit(const QString &file_Name);
 
     ~MainWindow();
 
@@ -30,7 +35,7 @@ protected:
 
 private slots:
     void new_File();
-    void open();
+    void open(std::string);
     bool save();
     bool save_As();
     void about();
@@ -47,8 +52,10 @@ private:
     bool maybe_Save();
     bool save_File(const QString &file_Name);
     void set_Current_File(const QString &file_Name);
+    void set_Current_HTML(const QString &file_Name);
     QString stripped_Name(const QString &full_File_Name);
     QString current_File;
+    QString current_HTML;
 };
 
 #endif // MAINWINDOW_H
