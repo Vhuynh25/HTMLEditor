@@ -13,6 +13,8 @@
 #include <QWebEngineView>
 #include <QUrl>
 
+#include "string_search.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -40,6 +42,7 @@ private slots:
     bool save_As();
     void about();
     void document_Was_Edited();
+
 //#ifndef QT_NO_SESSIONMANAGER
 //    void commit_Data(QSessionManager &);
 //#endif
@@ -49,13 +52,22 @@ private:
     void create_Actions();
     void read_Settings();
     void write_Settings();
+
     bool maybe_Save();
     bool save_File(const QString &file_Name);
+
     void set_Current_File(const QString &file_Name);
     void set_Current_HTML(const QString &file_Name);
+
+    void show_Search();
+    void search_Next_Text(QString text);
+    void search_Prev_Text(QString text);
+
     QString stripped_Name(const QString &full_File_Name);
-    QString current_File;
+    QString current_File_Name;
     QString current_HTML;
+
+    String_Search* search_Dialog;
 };
 
 #endif // MAINWINDOW_H

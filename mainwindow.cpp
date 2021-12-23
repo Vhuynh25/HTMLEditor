@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "string_search.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,6 +18,11 @@ MainWindow::MainWindow(QWidget *parent) :
 //#endif
     set_Current_File(QString());
     setUnifiedTitleAndToolBarOnMac(true);
+
+    this->search_Dialog = new String_Search(this);
+
+    connect(this->search_Dialog,&String_Search::find_Next,this,&MainWindow::search_Next_Text);
+    connect(this->search_Dialog,&String_Search::find_Prev,this,&MainWindow::search_Prev_Text);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
@@ -47,11 +53,11 @@ void MainWindow::open(std::string mode){
 }
 
 bool MainWindow::save(){
-    if (current_File.isEmpty()){
+    if (current_File_Name.isEmpty()){
         return save_As();
     }
     else {
-        return save_File(current_File);
+        return save_File(current_File_Name);
     }
 }
 
@@ -96,7 +102,8 @@ void MainWindow::create_Actions(){
     file_Menu->addAction(open_File_Act);
     file_Tool_Bar->addAction(open_File_Act);
 
-    QAction *open_Html_Act = new QAction(open_Icon, tr("&Open..."),this);
+    const QIcon global_Icon = QIcon("..\\icons\\globe.svg");
+    QAction *open_Html_Act = new QAction(global_Icon, tr("&Open..."),this);
     open_Html_Act->setStatusTip(tr("Open an html file to view"));
     connect(open_Html_Act,&QAction::triggered,this,[this]{open("HTML");});
     file_Menu->addAction(open_Html_Act);
@@ -109,6 +116,14 @@ void MainWindow::create_Actions(){
     connect(save_Act,&QAction::triggered,this,&MainWindow::save);
     file_Menu->addAction(save_Act);
     file_Tool_Bar->addAction(save_Act);
+
+    const QIcon search_Icon = QIcon("..\\icons\\magnifying-glass.svg");
+    QAction *search_Act = new QAction(search_Icon, tr("&search"),this);
+    search_Act->setShortcuts(QKeySequence::Save);
+    search_Act->setStatusTip(tr("Search the current file for a string"));
+    connect(search_Act,&QAction::triggered,this,&MainWindow::show_Search);
+    file_Menu->addAction(search_Act);
+    file_Tool_Bar->addAction(search_Act);
 
     QAction *about_Qt_Act = help_Menu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
     about_Qt_Act->setStatusTip(tr("Show the Qt library's About box"));
@@ -226,11 +241,11 @@ bool MainWindow::save_File(const QString &file_Name){
 }
 
 void MainWindow::set_Current_File(const QString &file_Name){
-    this->current_File = file_Name;
+    this->current_File_Name = file_Name;
     this->ui->text_Edit->document()->setModified(false);
     setWindowModified(false);
-    QString shown_name = current_File;
-    if (current_File.isEmpty())
+    QString shown_name = current_File_Name;
+    if (current_File_Name.isEmpty())
         shown_name = "untitled.txt";
     setWindowFilePath(shown_name);
 }
@@ -243,7 +258,21 @@ QString MainWindow::stripped_Name(const QString &full_File_Name){
     return QFileInfo(full_File_Name).fileName();
 }
 
+void MainWindow::show_Search(){
+    if (!search_Dialog->isVisible())
+        search_Dialog->show();
+}
+
+void MainWindow::search_Next_Text(QString text){
+    this->ui->text_Edit->find(text);
+}
+
+void MainWindow::search_Prev_Text(QString text){
+    this->ui->text_Edit->find(text, QTextDocument::FindBackward);
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
