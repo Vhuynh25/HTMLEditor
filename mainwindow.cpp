@@ -119,7 +119,7 @@ void MainWindow::create_Actions(){
 
     const QIcon search_Icon = QIcon("..\\icons\\magnifying-glass.svg");
     QAction *search_Act = new QAction(search_Icon, tr("&search"),this);
-    search_Act->setShortcuts(QKeySequence::Save);
+    search_Act->setShortcuts(QKeySequence::Find);
     search_Act->setStatusTip(tr("Search the current file for a string"));
     connect(search_Act,&QAction::triggered,this,&MainWindow::show_Search);
     file_Menu->addAction(search_Act);
