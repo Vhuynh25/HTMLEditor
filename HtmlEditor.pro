@@ -27,10 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        string_search.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+        string_search.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        string_search.ui

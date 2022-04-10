@@ -81,12 +81,13 @@ void MainWindow::document_Was_Edited(){
     setWindowModified(this->ui->text_Edit->document()->isModified());
 }
 
-void MainWindow::create_Actions(){
+void MainWindow::create_Actions(){ // make the icons near the top of the window
+
     QMenu *file_Menu = menuBar()->addMenu(tr("&File"));
     QMenu *help_Menu = menuBar()->addMenu(tr("&Help"));
     QToolBar *file_Tool_Bar = addToolBar(tr("File"));
 
-    const QIcon new_Icon = QIcon("..\\icons\\file-plus.svg");
+    const QIcon new_Icon = QIcon("..\\HTMLEditor\\icons\\file-plus.svg");
     QAction *new_Act = new QAction(new_Icon, tr("&New"),this);
     new_Act->setShortcuts(QKeySequence::New);
     new_Act->setStatusTip(tr("Create a new file"));
@@ -94,22 +95,22 @@ void MainWindow::create_Actions(){
     file_Menu->addAction(new_Act);
     file_Tool_Bar->addAction(new_Act);
 
-    const QIcon open_Icon = QIcon("..\\icons\\file.svg");
-    QAction *open_File_Act = new QAction(open_Icon, tr("&Open..."),this);
+    const QIcon open_Icon = QIcon("..\\HTMLEditor\\icons\\file.svg");
+    QAction *open_File_Act = new QAction(open_Icon, tr("&Open file..."),this);
     open_File_Act->setShortcuts(QKeySequence::Open);
     open_File_Act->setStatusTip(tr("Open an existing file to edit"));
     connect(open_File_Act,&QAction::triggered,this,[this]{open("FILE");});
     file_Menu->addAction(open_File_Act);
     file_Tool_Bar->addAction(open_File_Act);
 
-    const QIcon global_Icon = QIcon("..\\icons\\globe.svg");
-    QAction *open_Html_Act = new QAction(global_Icon, tr("&Open..."),this);
+    const QIcon global_Icon = QIcon("..\\HTMLEditor\\icons\\globe.svg");
+    QAction *open_Html_Act = new QAction(global_Icon, tr("&Open HTML view..."),this);
     open_Html_Act->setStatusTip(tr("Open an html file to view"));
     connect(open_Html_Act,&QAction::triggered,this,[this]{open("HTML");});
     file_Menu->addAction(open_Html_Act);
     file_Tool_Bar->addAction(open_Html_Act);
 
-    const QIcon save_Icon = QIcon("..\\icons\\save.svg");
+    const QIcon save_Icon = QIcon("..\\HTMLEditor\\icons\\save.svg");
     QAction *save_Act = new QAction(save_Icon, tr("&Save"),this);
     save_Act->setShortcuts(QKeySequence::Save);
     save_Act->setStatusTip(tr("Save the current file"));
@@ -117,7 +118,7 @@ void MainWindow::create_Actions(){
     file_Menu->addAction(save_Act);
     file_Tool_Bar->addAction(save_Act);
 
-    const QIcon search_Icon = QIcon("..\\icons\\magnifying-glass.svg");
+    const QIcon search_Icon = QIcon("..\\HTMLEditor\\icons\\magnifying-glass.svg");
     QAction *search_Act = new QAction(search_Icon, tr("&search"),this);
     search_Act->setShortcuts(QKeySequence::Find);
     search_Act->setStatusTip(tr("Search the current file for a string"));
@@ -254,7 +255,7 @@ void MainWindow::set_Current_HTML(const QString &file_Name){
     this->current_HTML = file_Name;
 }
 
-QString MainWindow::stripped_Name(const QString &full_File_Name){
+QString MainWindow::strip_Name(const QString &full_File_Name){
     return QFileInfo(full_File_Name).fileName();
 }
 
@@ -274,5 +275,12 @@ void MainWindow::search_Prev_Text(QString text){
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+
+void MainWindow::on_web_View_destroyed()
+{
+
 }
 

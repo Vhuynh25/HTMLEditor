@@ -13,9 +13,6 @@ String_Search::~String_Search()
     delete ui;
 }
 
-
-
-
 void String_Search::on_next_String_Button_clicked()
 {
     emit find_Next(this->ui->string_To_Search->toPlainText());

@@ -38,8 +38,16 @@
         <height>0</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
       <property name="lineWrapMode">
        <enum>QTextEdit::NoWrap</enum>
+      </property>
+      <property name="tabStopWidth">
+       <number>30</number>
       </property>
      </widget>
     </item>

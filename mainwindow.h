@@ -47,6 +47,8 @@ private slots:
 //    void commit_Data(QSessionManager &);
 //#endif
 
+    void on_web_View_destroyed();
+
 private:
     Ui::MainWindow *ui;
     void create_Actions();
@@ -63,7 +65,7 @@ private:
     void search_Next_Text(QString text);
     void search_Prev_Text(QString text);
 
-    QString stripped_Name(const QString &full_File_Name);
+    QString strip_Name(const QString &full_File_Name);
     QString current_File_Name;
     QString current_HTML;
 
